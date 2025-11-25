@@ -1,21 +1,30 @@
-FROM ubuntu
+FROM ubuntu:24.04
 
-MAINTAINER Angelo Veltens <angelo.veltens@online.de>
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-    apt-get install mysql-client cron bzip2 -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    mkdir /backups
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    bash \
+    mariadb-client \
+    cron \
+    tzdata \
+    curl \
+    bzip2 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV MYSQL_ENV_MYSQL_HOST mysql
-ENV BACKUP_TIME 0 3 * * *
+# Default ENV from original image
+ENV MYSQL_ENV_MYSQL_HOST=mysql
+ENV BACKUP_TIME="0 3 * * *"
 
+# Copy scripts
 COPY docker-entrypoint.sh /entrypoint.sh
 COPY backup restore /bin/
+
+RUN chmod +x /entrypoint.sh /bin/backup /bin/restore
 
 VOLUME /backups
 
 ENTRYPOINT ["/entrypoint.sh"]
-
 CMD ["cron", "-f"]
+
