@@ -18,8 +18,8 @@ ENV MYSQL_ENV_MYSQL_HOST=mysql
 ENV BACKUP_TIME="0 3 * * *"
 
 # Copy scripts
-COPY docker-entrypoint.sh /entrypoint.sh
-COPY backup restore /bin/
+COPY src/docker-entrypoint.sh /entrypoint.sh
+COPY src/backup src/restore /bin/
 
 RUN chmod +x /entrypoint.sh /bin/backup /bin/restore
 
